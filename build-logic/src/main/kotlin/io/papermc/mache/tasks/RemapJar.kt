@@ -33,11 +33,11 @@ abstract class RemapJar : DefaultTask() {
 
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
-    abstract val serverJar: RegularFileProperty
+    abstract val inputJar: RegularFileProperty
 
     @get:PathSensitive(PathSensitivity.NONE)
     @get:InputFile
-    abstract val serverMappings: RegularFileProperty
+    abstract val inputMappings: RegularFileProperty
 
     @get:Classpath
     abstract val codebookClasspath: ConfigurableFileCollection
@@ -79,10 +79,10 @@ abstract class RemapJar : DefaultTask() {
 
         queue.submit(RunCodeBookWorker::class) {
             tempDir.set(layout.buildDirectory.dir(".tmp_codebook"))
-            serverJar.set(this@RemapJar.serverJar)
+            inputJar.set(this@RemapJar.inputJar)
             classpath.from(this@RemapJar.minecraftClasspath)
             remapperClasspath.from(this@RemapJar.remapperClasspath)
-            serverMappings.set(this@RemapJar.serverMappings)
+            inputMappings.set(this@RemapJar.inputMappings)
             paramMappings.from(this@RemapJar.paramMappings)
             constants.from(this@RemapJar.constants)
             outputJar.set(this@RemapJar.outputJar)

@@ -10,7 +10,6 @@ import java.nio.file.Path
 import kotlin.io.path.absolute
 import kotlin.io.path.createDirectories
 import kotlin.io.path.deleteIfExists
-import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.outputStream
 import org.gradle.api.file.ConfigurableFileCollection
@@ -23,10 +22,10 @@ import org.gradle.workers.WorkParameters
 abstract class RunCodeBookWorker : WorkAction<RunCodeBookWorker.RunCodebookParameters> {
     interface RunCodebookParameters : WorkParameters {
         val tempDir: DirectoryProperty
-        val serverJar: RegularFileProperty
+        val inputJar: RegularFileProperty
         val classpath: ConfigurableFileCollection
         val remapperClasspath: ConfigurableFileCollection
-        val serverMappings: RegularFileProperty
+        val inputMappings: RegularFileProperty
         val paramMappings: ConfigurableFileCollection
         val constants: ConfigurableFileCollection
         val unpickDefinitions: ConfigurableFileCollection
@@ -68,7 +67,7 @@ abstract class RunCodeBookWorker : WorkAction<RunCodeBookWorker.RunCodebookParam
                         .jars(parameters.remapperClasspath.files.map { it.toPath().absolute() })
                         .build(),
                 )
-                .mappings(CodeBookResource.ofFile(parameters.serverMappings.get().asFile.toPath().absolute()))
+                .mappings(CodeBookResource.ofFile(parameters.inputMappings.get().asFile.toPath().absolute()))
                 .paramMappings(CodeBookResource.ofFile(parameters.paramMappings.singleFile.toPath().absolute()))
                 .unpickDefinitions(parameters.unpickDefinitions.files.singleOrNull()?.let { CodeBookResource.ofFile(it.toPath().absolute()) })
                 .constantsJar(parameters.constants.files.singleOrNull()?.let { CodeBookResource.ofFile(it.toPath().absolute()) })
@@ -76,7 +75,7 @@ abstract class RunCodeBookWorker : WorkAction<RunCodeBookWorker.RunCodebookParam
                 .overwrite(false)
                 .input(
                     CodeBookInput.ofJar()
-                        .inputJar(parameters.serverJar.get().asFile.toPath().absolute())
+                        .inputJar(parameters.inputJar.get().asFile.toPath().absolute())
                         .classpathJars(parameters.classpath.files.map { it.toPath().absolute() })
                         .build(),
                 )

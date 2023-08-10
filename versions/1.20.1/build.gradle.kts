@@ -3,7 +3,8 @@ plugins {
 }
 
 mache {
-    minecraftVersion = "1.20.1"
+    minecraftVersion.set("1.20.1")
+    minecraftJarType.set("server")
 }
 
 dependencies {

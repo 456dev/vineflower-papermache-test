@@ -1,13 +1,13 @@
 import io.papermc.mache.ConfigureVersionProject
 import io.papermc.mache.MacheExtension
 import io.papermc.mache.constants.DECOMP_JAR
-import io.papermc.mache.constants.DOWNLOAD_SERVER_JAR
+import io.papermc.mache.constants.DOWNLOAD_INPUT_JAR
 import io.papermc.mache.constants.FAILED_PATCH_JAR
 import io.papermc.mache.constants.PATCHED_JAR
 import io.papermc.mache.constants.REMAPPED_JAR
 import io.papermc.mache.constants.REPO_URL
-import io.papermc.mache.constants.SERVER_JAR
-import io.papermc.mache.constants.SERVER_MAPPINGS
+import io.papermc.mache.constants.INPUT_JAR
+import io.papermc.mache.constants.INPUT_MAPPINGS
 import io.papermc.mache.tasks.ApplyPatches
 import io.papermc.mache.tasks.ApplyPatchesFuzzy
 import io.papermc.mache.tasks.DecompileJar
@@ -44,13 +44,19 @@ configurations.implementation {
 }
 
 val extractServerJar by tasks.registering(ExtractServerJar::class) {
-    downloadedJar.set(layout.dotGradleDirectory.file(DOWNLOAD_SERVER_JAR))
-    serverJar.set(layout.dotGradleDirectory.file(SERVER_JAR))
+    downloadedJar.set(layout.dotGradleDirectory.file(DOWNLOAD_INPUT_JAR))
+    inputJar.set(layout.dotGradleDirectory.file(INPUT_JAR))
 }
 
 val remapJar by tasks.registering(RemapJar::class) {
-    serverJar.set(extractServerJar.flatMap { it.serverJar })
-    serverMappings.set(layout.dotGradleDirectory.file(SERVER_MAPPINGS))
+    // if type = client, skip extracting
+    if (mache.minecraftJarType.getOrElse("SERVER").uppercase() == "SERVER") {
+        inputJar.set(extractServerJar.flatMap { it.inputJar })
+    } else {
+        inputJar.set(layout.dotGradleDirectory.file(DOWNLOAD_INPUT_JAR))
+    }
+
+    inputMappings.set(layout.dotGradleDirectory.file(INPUT_MAPPINGS))
 
     codebookClasspath.from(codebook)
     minecraftClasspath.from(minecraft)
@@ -82,7 +88,8 @@ val applyPatches by tasks.registering(ApplyPatches::class) {
         patchDir.set(patchesDir)
     }
 
-    useNativeDiff.set(providers.gradleProperty("useNativeDiff").map { it.toBoolean() }.orElse(isNativeDiffAvailable()))
+    useNativeDiff.set(providers.gradleProperty("useNativeDiff").map { it.toBoolean() }
+        .orElse(isNativeDiffAvailable()))
     providers.gradleProperty("patchExecutable").let { ex ->
         if (ex.isPresent) {
             patchExecutable.set(ex)
@@ -113,8 +120,9 @@ val applyPatchesFuzzy by tasks.registering(ApplyPatchesFuzzy::class) {
     finalizedBy(setupSources)
 
     group = "mache"
-    description = "Attempt to apply patches with a fuzzy factor specified by --max-fuzz=<non-negative-int>. " +
-        "This is not intended for normal use."
+    description =
+        "Attempt to apply patches with a fuzzy factor specified by --max-fuzz=<non-negative-int>. " +
+                "This is not intended for normal use."
 
     patchDir.set(layout.projectDirectory.dir("patches"))
 
@@ -124,9 +132,17 @@ val applyPatchesFuzzy by tasks.registering(ApplyPatchesFuzzy::class) {
 
 val copyResources by tasks.registering(Sync::class) {
     into(layout.projectDirectory.dir("src/main/resources"))
-    from(zipTree(extractServerJar.flatMap { it.serverJar })) {
-        exclude("**/*.class", "META-INF/**")
+
+    if (mache.minecraftJarType.getOrElse("SERVER").uppercase() == "SERVER") {
+        from(zipTree(extractServerJar.flatMap { it.inputJar })) {
+            exclude("**/*.class", "META-INF/**")
+        }
+    } else {
+        from(zipTree(layout.dotGradleDirectory.file(DOWNLOAD_INPUT_JAR))) {
+            exclude("**/*.class", "META-INF/**")
+        }
     }
+
     includeEmptyDirs = false
 }
 
@@ -142,7 +158,8 @@ tasks.register("rebuildPatches", RebuildPatches::class) {
     decompJar.set(decompileJar.flatMap { it.outputJar })
     sourceDir.set(layout.projectDirectory.dir("src/main/java"))
 
-    useNativeDiff.set(providers.gradleProperty("useNativeDiff").map { it.toBoolean() }.orElse(isNativeDiffAvailable()))
+    useNativeDiff.set(providers.gradleProperty("useNativeDiff").map { it.toBoolean() }
+        .orElse(isNativeDiffAvailable()))
 
     patchDir.set(layout.projectDirectory.dir("patches"))
 }

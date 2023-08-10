@@ -16,6 +16,8 @@ open class MacheExtension(objects: ObjectFactory) {
      */
     val minecraftVersion: Property<String> = objects.property()
 
+    val minecraftJarType: Property<String> = objects.property()
+
     /**
      * Base arguments passed to the decompiler.
      */

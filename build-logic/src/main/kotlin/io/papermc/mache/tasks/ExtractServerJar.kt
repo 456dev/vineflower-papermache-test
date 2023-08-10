@@ -24,12 +24,12 @@ abstract class ExtractServerJar : DefaultTask() {
     abstract val downloadedJar: RegularFileProperty
 
     @get:OutputFile
-    abstract val serverJar: RegularFileProperty
+    abstract val inputJar: RegularFileProperty
 
     @TaskAction
     fun run() {
         val jar = downloadedJar.convertToPath()
-        val out = serverJar.convertToPath().ensureClean()
+        val out = inputJar.convertToPath().ensureClean()
 
         jar.useZip { root ->
             val metaInf = root.resolve("META-INF")
@@ -49,12 +49,12 @@ abstract class ExtractServerJar : DefaultTask() {
                 throw Exception("versions.list line is invalid")
             }
 
-            val serverJarInJar = metaInf.resolve("versions").resolve(parts[2])
-            if (serverJarInJar.notExists()) {
+            val inputJarInJar = metaInf.resolve("versions").resolve(parts[2])
+            if (inputJarInJar.notExists()) {
                 throw Exception("Could not find version jar")
             }
 
-            serverJarInJar.copyTo(out)
+            inputJarInJar.copyTo(out)
         }
     }
 }
