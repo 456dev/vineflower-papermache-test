@@ -1,0 +1,11 @@
+--- a/com/mojang/blaze3d/platform/MacosUtil.java
++++ b/com/mojang/blaze3d/platform/MacosUtil.java
+@@ -23,7 +23,7 @@
+     }
+ 
+     private static boolean isInKioskMode(NSObject window) {
+-        return (window.sendRaw("styleMask", new Object[0]) & 16384L) == 16384L;
++        return ((long) window.sendRaw("styleMask", new Object[0]) & 16384L) == 16384L;
+     }
+ 
+     private static void toggleFullscreen(NSObject window) {

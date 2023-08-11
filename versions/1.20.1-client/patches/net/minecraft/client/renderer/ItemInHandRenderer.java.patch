@@ -1,0 +1,33 @@
+--- a/net/minecraft/client/renderer/ItemInHandRenderer.java
++++ b/net/minecraft/client/renderer/ItemInHandRenderer.java
+@@ -492,21 +492,21 @@
+                             poseStack.mulPose(Axis.XP.rotationDegrees(-55.0F));
+                             poseStack.mulPose(Axis.YP.rotationDegrees((float)i1 * 35.3F));
+                             poseStack.mulPose(Axis.ZP.rotationDegrees((float)i1 * -9.785F));
+-                            float f4 = (float)stack.getUseDuration() - ((float)this.minecraft.player.getUseItemRemainingTicks() - partialTicks + 1.0F);
+-                            float f = f4 / 10.0F;
+-                            if (f > 1.0F) {
+-                                f = 1.0F;
++                            float f5 = (float)stack.getUseDuration() - ((float)this.minecraft.player.getUseItemRemainingTicks() - partialTicks + 1.0F);
++                            float f6 = f5 / 10.0F;
++                            if (f6 > 1.0F) {
++                                f6 = 1.0F;
+                             }
+ 
+-                            if (f > 0.1F) {
+-                                float f1 = Mth.sin((f4 - 0.1F) * 1.3F);
+-                                float sin = f - 0.1F;
++                            if (f6 > 0.1F) {
++                                float f1 = Mth.sin((f5 - 0.1F) * 1.3F);
++                                float sin = f6 - 0.1F;
+                                 float f2 = f1 * sin;
+                                 poseStack.translate(f2 * 0.0F, f2 * 0.004F, f2 * 0.0F);
+                             }
+ 
+-                            poseStack.translate(0.0F, 0.0F, f * 0.2F);
+-                            poseStack.scale(1.0F, 1.0F, 1.0F + f * 0.2F);
++                            poseStack.translate(0.0F, 0.0F, f6 * 0.2F);
++                            poseStack.scale(1.0F, 1.0F, 1.0F + f6 * 0.2F);
+                             poseStack.mulPose(Axis.YN.rotationDegrees((float)i1 * 45.0F));
+                             break;
+                         case BRUSH:
