@@ -31,37 +31,51 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      - uses: actions/cache@v3
+        id: gradle-cache
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle/dependency-locks/*.lockfile') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradle-
+      - uses: actions/cache@v3
+        id: gradle-wrapper-cache
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('**/gradle/wrapper/*') }}
+          restore-keys: |
+            - ${{ runner.os }}-gradlewrapper-
+
       - name: Build Vineflower
         run: |
           cd vineflower
           # Setting the STATUS is used to easily identify the build from multiple output jars
-          STATUS=snapshot ./gradlew publishtomavenlocal -x test
+          STATUS=snapshot ./gradlew --build-cache publishtomavenlocal -x test
 
       - name: Decompile Minecraft
         run: |
           cd mache
-          ./gradlew applyPatches
+          ./gradlew applyPatches --build-cache
 
       - name: Try to build
         continue-on-error: true
         run: |
           cd mache
-          ( ./gradlew build 3>&1 1>&2- 2>&3- ) | tee build-log.txt
+          ( ./gradlew --build-cache build 3>&1 1>&2- 2>&3- ) | tee build-log.txt
 
       - uses: actions/upload-artifact@v3
+        name: "Upload build log"
         with:
           name: build-log
           path: mache/build-log.txt
 
       - uses: actions/upload-artifact@v3
+        name: "Upload decompile log"
         with:
           name: decompile-log
           path: mache/versions/*/build/mache/input/decomp.jar.log
 
-      - run: |
+      - name: add summary
+        run: |
           cd mache
-          regex="([0-9]+) errors"
-          if [[ $(cat build-log.txt) =~ $regex ]] then
-            echo "# Re-compile errors" >> $GITHUB_STEP_SUMMARY
-            echo "${BASH_REMATCH[1]} errors found" >> $GITHUB_STEP_SUMMARY
-          fi
+          cat build-log.txt | grep -xE '[0-9]+ errors' >> $GITHUB_STEP_SUMMARY
