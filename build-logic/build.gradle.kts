@@ -40,6 +40,16 @@ subprojects {
 allprojects {
     repositories {
         mavenCentral()
+        repositories {
+            exclusiveContent {
+                forRepository {
+                    mavenLocal()
+                }
+                filter {
+                    includeGroup("org.vineflower")
+                }
+            }
+        }
     }
 
     afterEvaluate {
@@ -70,14 +80,16 @@ allprojects {
         spotless {
             kotlin {
                 ktlint(libs.versions.ktlint.get())
-                    .editorConfigOverride(mapOf(
-                        "indent_size" to "4",
-                        "indent_style" to "space",
-                        "max_line_length" to "150",
-                        "ktlint_code_style" to "ktlint_official",
-                        "ktlint_standard_filename" to "disabled",
-                        "ij_kotlin_imports_layout" to "*,|,^"
-                    ))
+                    .editorConfigOverride(
+                        mapOf(
+                            "indent_size" to "4",
+                            "indent_style" to "space",
+                            "max_line_length" to "150",
+                            "ktlint_code_style" to "ktlint_official",
+                            "ktlint_standard_filename" to "disabled",
+                            "ij_kotlin_imports_layout" to "*,|,^"
+                        )
+                    )
             }
         }
     }
