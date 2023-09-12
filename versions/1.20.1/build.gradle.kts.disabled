@@ -1,3 +1,5 @@
+// disabled since client should cover both
+
 plugins {
     id("mache")
 }

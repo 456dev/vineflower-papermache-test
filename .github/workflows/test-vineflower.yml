@@ -1,0 +1,48 @@
+name: Test Minecraft recompilation
+# started from https://github.com/sschr15/vineflower-testing
+on:
+  workflow_dispatch:
+    inputs:
+      vf_branch:
+        description: 'Vineflower branch to test'
+        required: true
+        default: 'develop/1.10.0'
+        type: string
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          path: mache
+
+      - name: Clone Vineflower
+        uses: actions/checkout@v3
+        with:
+          repository: Vineflower/Vineflower
+          ref: ${{ github.event.inputs.vf_branch }}
+          path: vineflower
+
+      - name: Build Vineflower
+        run: |
+          cd vineflower
+          # Setting the STATUS is used to easily identify the build from multiple output jars
+          STATUS=snapshot ./gradlew publishtomavenlocal -x test
+          cd ..
+
+      - name: Decompile Minecraft
+        run: |
+          cd mache
+          ./gradlew applyPatches
+
+      - name: Try to build
+        run: |
+          cd mache
+          ./gradlew build
