@@ -18,6 +18,11 @@ repositories {
     }
 }
 
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor(10, "seconds")
+    resolutionStrategy.cacheChangingModulesFor(10, "seconds")
+}
+
 
 dependencies {
     codebook("1.0.6")
