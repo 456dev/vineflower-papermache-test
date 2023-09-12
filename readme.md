@@ -1,4 +1,4 @@
-Mâché
+Vineflower Minecraft client recompile test CI (ish) based on Mâché
 =====
 
 Mâché (from [papier-mâché](https://en.wikipedia.org/wiki/Papier-m%C3%A2ch%C3%A9)) is an environment which aims to
