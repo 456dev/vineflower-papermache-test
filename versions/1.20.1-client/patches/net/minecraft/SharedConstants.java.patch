@@ -1,0 +1,8 @@
+--- a/net/minecraft/SharedConstants.java
++++ b/net/minecraft/SharedConstants.java
+@@ -1,4 +1,4 @@
+-package net.minecraft;
++package net.minecraft; // diff
+ 
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import com.mojang.datafixers.DSL.TypeReference;
