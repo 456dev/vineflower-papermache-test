@@ -40,16 +40,6 @@ subprojects {
 allprojects {
     repositories {
         mavenCentral()
-        repositories {
-            exclusiveContent {
-                forRepository {
-                    mavenLocal()
-                }
-                filter {
-                    includeGroup("org.vineflower")
-                }
-            }
-        }
     }
 
     afterEvaluate {

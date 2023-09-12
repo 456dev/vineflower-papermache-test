@@ -7,6 +7,18 @@ mache {
     minecraftJarType.set("client")
 }
 
+repositories {
+    exclusiveContent {
+        forRepository {
+            mavenLocal()
+        }
+        filter {
+            includeGroup("org.vineflower")
+        }
+    }
+}
+
+
 dependencies {
     codebook("1.0.6")
     remapper(art("1.0.5"))
