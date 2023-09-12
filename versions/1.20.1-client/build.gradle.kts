@@ -17,3 +17,10 @@ dependencies {
 dependencies {
     compileOnly("org.jetbrains:annotations:24.0.1")
 }
+
+// pass flags to javac
+gradle.projectsEvaluated {
+    tasks.withType(JavaCompile::class) {
+        options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+    }
+}
