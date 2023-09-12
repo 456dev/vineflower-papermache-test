@@ -5,7 +5,7 @@
  
      public static <K> Strategy<K> identityStrategy() {
 -        return Util.IdentityStrategy.INSTANCE;
-+        return (Strategy<K>) IdentityStrategy.INSTANCE;
++        return Util.IdentityStrategy.INSTANCE; // Meaningless change so it patches
      }
  
      public static <V> CompletableFuture<List<V>> sequence(List<? extends CompletableFuture<V>> futures) {
